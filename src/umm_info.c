@@ -124,7 +124,7 @@ void *umm_info( void *ptr, int force ) {
     }
   }
 
-  PRINT("|0x%08lx|B %5i|NB %5i|PB %5i|Z %5i|NF %5i|PF %5i|\n",
+  PRINT("|          |0x%08lx|B %5i|NB %5i|PB %5i|Z %5i|NF %5i|PF %5i|\n",
       (unsigned long)(&UMM_BLOCK(blockNo)),
       blockNo,
       UMM_NBLOCK(blockNo) & UMM_BLOCKNO_MASK,
