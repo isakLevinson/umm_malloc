@@ -39,13 +39,20 @@
  * ----------------------------------------------------------------------------
  */
 
+#include <sys_def.h>
+#include "dbgMenus.h"
+#include "dbgPrint.h"
+
 #ifdef TEST_BUILD
 extern char test_umm_heap[];
 #endif
 
+
+extern char heap[];
+
 /* Start addresses and the size of the heap */
-#define UMM_MALLOC_CFG_HEAP_ADDR (test_umm_heap)
-#define UMM_MALLOC_CFG_HEAP_SIZE 0x10000
+#define UMM_MALLOC_CFG_HEAP_ADDR	(heap)
+#define UMM_MALLOC_CFG_HEAP_SIZE	UMM_HEAP_SIZE
 
 /* A couple of macros to make packing structures less compiler dependent */
 

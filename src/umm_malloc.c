@@ -31,6 +31,12 @@
  * ----------------------------------------------------------------------------
  */
 
+#define DEF_DBG_MODULE	DBG_MODULE_MAIN
+
+#include <sys_def.h>
+#include "dbgMenus.h"
+#include "dbgPrint.h"
+
 #include <stdio.h>
 #include <string.h>
 
@@ -42,7 +48,7 @@
 
 #define DBGLOG_LEVEL 0
 
-#include "dbglog/dbglog.h"
+//#include "dbglog/dbglog.h"
 
 /* ------------------------------------------------------------------------- */
 
@@ -166,7 +172,7 @@ static void umm_assimilate_up( unsigned short int c ) {
      * the free list
      */
 
-    DBGLOG_DEBUG( "Assimilate up to next block, which is FREE\n" );
+    TRACE( "Assimilate up to next block, which is FREE\n" );
 
     /* Disconnect the next block from the FREE list */
 
@@ -272,7 +278,7 @@ static void umm_free_core( void *ptr ) {
 
   c = (((char *)ptr)-(char *)(&(umm_heap[0])))/sizeof(umm_block);
 
-  DBGLOG_DEBUG( "Freeing block %6i\n", c );
+  TRACE( "Freeing block %6i\n", c );
 
   /* Now let's assimilate this block with the next one if possible. */
 
@@ -282,7 +288,7 @@ static void umm_free_core( void *ptr ) {
 
   if( UMM_NBLOCK(UMM_PBLOCK(c)) & UMM_FREELIST_MASK ) {
 
-    DBGLOG_DEBUG( "Assimilate down to next block, which is FREE\n" );
+    TRACE( "Assimilate down to next block, which is FREE\n" );
 
     c = umm_assimilate_down(c, UMM_FREELIST_MASK);
   } else {
@@ -291,7 +297,7 @@ static void umm_free_core( void *ptr ) {
      * of the free list
      */
 
-    DBGLOG_DEBUG( "Just add to head of free list\n" );
+    TRACE( "Just add to head of free list\n" );
 
     UMM_PFREE(UMM_NFREE(0)) = c;
     UMM_NFREE(c)            = UMM_NFREE(0);
@@ -313,7 +319,7 @@ void umm_free( void *ptr ) {
   /* If we're being asked to free a NULL pointer, well that's just silly! */
 
   if( (void *)0 == ptr ) {
-    DBGLOG_DEBUG( "free a null pointer -> do nothing\n" );
+    TRACE( "free a null pointer -> do nothing\n" );
 
     return;
   }
@@ -359,7 +365,7 @@ static void *umm_malloc_core( size_t size ) {
   while( cf ) {
     blockSize = (UMM_NBLOCK(cf) & UMM_BLOCKNO_MASK) - cf;
 
-    DBGLOG_TRACE( "Looking at block %6i size %6i\n", cf, blockSize );
+    TRACE( "Looking at block %6i size %6i\n", cf, blockSize );
 
 #if defined UMM_BEST_FIT
     if( (blockSize >= blocks) && (blockSize < bestSize) ) {
@@ -392,7 +398,7 @@ static void *umm_malloc_core( size_t size ) {
 
     if( blockSize == blocks ) {
       /* It's an exact fit and we don't neet to split off a block. */
-      DBGLOG_DEBUG( "Allocating %6i blocks starting at %6i - exact\n", blocks, cf );
+      TRACE( "Allocating %6i blocks starting at %6i - exact\n", blocks, cf );
 
       /* Disconnect this block from the FREE list */
 
@@ -400,7 +406,7 @@ static void *umm_malloc_core( size_t size ) {
 
     } else {
       /* It's not an exact fit and we need to split off a block. */
-      DBGLOG_DEBUG( "Allocating %6i blocks starting at %6i - existing\n", blocks, cf );
+      TRACE( "Allocating %6i blocks starting at %6i - existing\n", blocks, cf );
 
       /*
        * split current free block `cf` into two blocks. The first one will be
@@ -426,7 +432,7 @@ static void *umm_malloc_core( size_t size ) {
   } else {
     /* Out of memory */
 
-    DBGLOG_DEBUG(  "Can't allocate %5i blocks\n", blocks );
+    TRACE(  "Can't allocate %5i blocks\n", blocks );
 
     return( (void *)NULL );
   }
@@ -452,7 +458,7 @@ void *umm_malloc( size_t size ) {
    */
 
   if( 0 == size ) {
-    DBGLOG_DEBUG( "malloc a block of 0 bytes -> do nothing\n" );
+    TRACE( "malloc a block of 0 bytes -> do nothing\n" );
 
     return( ptr );
   }
@@ -494,7 +500,7 @@ void *umm_realloc( void *ptr, size_t size ) {
    */
 
   if( ((void *)NULL == ptr) ) {
-    DBGLOG_DEBUG( "realloc the NULL pointer - call malloc()\n" );
+    TRACE( "realloc the NULL pointer - call malloc()\n" );
 
     return( umm_malloc(size) );
   }
@@ -506,7 +512,7 @@ void *umm_realloc( void *ptr, size_t size ) {
    */
 
   if( 0 == size ) {
-    DBGLOG_DEBUG( "realloc to 0 size, just free the block\n" );
+    TRACE( "realloc to 0 size, just free the block\n" );
 
     umm_free( ptr );
 
@@ -555,7 +561,7 @@ void *umm_realloc( void *ptr, size_t size ) {
       prevBlockSize = (c - UMM_PBLOCK(c));
   }
 
-  DBGLOG_DEBUG( "realloc blocks %i blockSize %i nextBlockSize %i prevBlockSize %i\n", blocks, blockSize, nextBlockSize, prevBlockSize );
+  TRACE( "realloc blocks %i blockSize %i nextBlockSize %i prevBlockSize %i\n", blocks, blockSize, nextBlockSize, prevBlockSize );
 
   /*
    * Ok, now that we're here we know how many blocks we want and the current
@@ -582,21 +588,21 @@ void *umm_realloc( void *ptr, size_t size ) {
    */
 
     if (blockSize >= blocks) {
-        DBGLOG_DEBUG( "realloc the same or smaller size block - %i, do nothing\n", blocks );
+        TRACE( "realloc the same or smaller size block - %i, do nothing\n", blocks );
         /* This space intentionally left blank */
     } else if ((blockSize + nextBlockSize) >= blocks) {
-        DBGLOG_DEBUG( "realloc using next block - %i\n", blocks );
+        TRACE( "realloc using next block - %i\n", blocks );
         umm_assimilate_up( c );
         blockSize += nextBlockSize;
     } else if ((prevBlockSize + blockSize) >= blocks) {
-        DBGLOG_DEBUG( "realloc using prev block - %i\n", blocks );
+        TRACE( "realloc using prev block - %i\n", blocks );
         umm_disconnect_from_free_list( UMM_PBLOCK(c) );
         c = umm_assimilate_down(c, 0);
         memmove( (void *)&UMM_DATA(c), ptr, curSize );
         ptr = (void *)&UMM_DATA(c);
         blockSize += prevBlockSize;
     } else if ((prevBlockSize + blockSize + nextBlockSize) >= blocks) {
-        DBGLOG_DEBUG( "realloc using prev and next block - %i\n", blocks );
+        TRACE( "realloc using prev and next block - %i\n", blocks );
         umm_assimilate_up( c );
         umm_disconnect_from_free_list( UMM_PBLOCK(c) );
         c = umm_assimilate_down(c, 0);
@@ -604,14 +610,14 @@ void *umm_realloc( void *ptr, size_t size ) {
         ptr = (void *)&UMM_DATA(c);
         blockSize += (prevBlockSize + nextBlockSize);
     } else {
-        DBGLOG_DEBUG( "realloc a completely new block %i\n", blocks );
+        TRACE( "realloc a completely new block %i\n", blocks );
         void *oldptr = ptr;
         if( (ptr = umm_malloc_core( size )) ) {
-            DBGLOG_DEBUG( "realloc %i to a bigger block %i, copy, and free the old\n", blockSize, blocks );
+            TRACE( "realloc %i to a bigger block %i, copy, and free the old\n", blockSize, blocks );
             memcpy( ptr, oldptr, curSize );
             umm_free_core( oldptr );
         } else {
-            DBGLOG_DEBUG( "realloc %i to a bigger block %i failed - return NULL and leave the old block!\n", blockSize, blocks );
+            TRACE( "realloc %i to a bigger block %i failed - return NULL and leave the old block!\n", blockSize, blocks );
             /* This space intentionally left blnk */
         }
         blockSize = blocks;
@@ -622,7 +628,7 @@ void *umm_realloc( void *ptr, size_t size ) {
      */
 
     if (blockSize > blocks ) {
-        DBGLOG_DEBUG( "split and free %i blocks from %i\n", blocks, blockSize );
+        TRACE( "split and free %i blocks from %i\n", blocks, blockSize );
         umm_split_block( c, blocks, 0 );
         umm_free_core( (void *)&UMM_DATA(c+blocks) );
     }
