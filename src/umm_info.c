@@ -1,15 +1,5 @@
 #ifdef UMM_INFO
 
-#define DEF_DBG_MODULE	DBG_MODULE_MAIN
-
-#include <sys_def.h>
-#include "dbgMenus.h"
-#include "dbgPrint.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-
-
 /* ----------------------------------------------------------------------------
  * One of the coolest things about this little library is that it's VERY
  * easy to get debug information about the memory heap by simply iterating

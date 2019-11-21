@@ -39,10 +39,6 @@
  * ----------------------------------------------------------------------------
  */
 
-#include <sys_def.h>
-#include "dbgMenus.h"
-#include "dbgPrint.h"
-
 #ifdef TEST_BUILD
 extern char test_umm_heap[];
 #endif
