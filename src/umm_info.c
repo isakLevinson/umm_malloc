@@ -17,8 +17,8 @@
 
 UMM_HEAP_INFO ummHeapInfo;
 
-void *umm_info( void *ptr, int force ) {
-
+void *umm_info( void *ptr, int force )
+{
   unsigned short int blockNo = 0;
 
   /* Protect the critical section... */
@@ -31,8 +31,8 @@ void *umm_info( void *ptr, int force ) {
   memset( &ummHeapInfo, 0, sizeof( ummHeapInfo ) );
 
   PRINT("\n" );
-  PRINT("+----------+----------+-------+--------+--------+-------+--------+--------+\n" );
-  PRINT("|          |0x%08lx|B %5i|NB %5i|PB %5i|Z %5i|NF %5i|PF %5i|\n",
+  PRINT("+--------+--------+-------+--------+--------+-------+--------+--------+\n" );
+  PRINT("|        |%08lx|B %5i|NB %5i|PB %5i|Z %5i|NF %5i|PF %5i|\n",
       (unsigned long)(&UMM_BLOCK(blockNo)),
       blockNo,
       UMM_NBLOCK(blockNo) & UMM_BLOCKNO_MASK,
@@ -65,7 +65,7 @@ void *umm_info( void *ptr, int force ) {
         ummHeapInfo.maxFreeContiguousBlocks = curBlocks;
       }
 
-      PRINT("|          |0x%08lx|B %5i|NB %5i|PB %5i|Z %5u|NF %5i|PF %5i|\n",
+      PRINT("|        |%08lx|B %5i|NB %5i|PB %5i|Z %5u|NF %5i|PF %5i|\n",
           (unsigned long)(&UMM_BLOCK(blockNo)),
           blockNo,
           UMM_NBLOCK(blockNo) & UMM_BLOCKNO_MASK,
@@ -87,7 +87,7 @@ void *umm_info( void *ptr, int force ) {
       ++ummHeapInfo.usedEntries;
       ummHeapInfo.usedBlocks += curBlocks;
 
-      PRINT("|0x%08lx|0x%08lx|B %5i|NB %5i|PB %5i|Z %5u|\n",
+      PRINT("|%08lx|%08lx|B %5i|NB %5i|PB %5i|Z %5u|\n",
    		  (unsigned long)(&UMM_BLOCK(blockNo))+4,
           (unsigned long)(&UMM_BLOCK(blockNo)),
           blockNo,
@@ -114,7 +114,7 @@ void *umm_info( void *ptr, int force ) {
     }
   }
 
-  PRINT("|          |0x%08lx|B %5i|NB %5i|PB %5i|Z %5i|NF %5i|PF %5i|\n",
+  PRINT("|        |%08lx|B %5i|NB %5i|PB %5i|Z %5i|NF %5i|PF %5i|\n",
       (unsigned long)(&UMM_BLOCK(blockNo)),
       blockNo,
       UMM_NBLOCK(blockNo) & UMM_BLOCKNO_MASK,
@@ -123,7 +123,7 @@ void *umm_info( void *ptr, int force ) {
       UMM_NFREE(blockNo),
       UMM_PFREE(blockNo) );
 
-  PRINT("+----------+-------+--------+--------+-------+--------+--------+\n" );
+  PRINT("+--------+--------+-------+--------+--------+-------+--------+--------+\n" );
 
   PRINT("Total Entries %5i    Used Entries %5i    Free Entries %5i\n",
       ummHeapInfo.totalEntries,
@@ -135,6 +135,7 @@ void *umm_info( void *ptr, int force ) {
       ummHeapInfo.usedBlocks,
       ummHeapInfo.freeBlocks  );
 
+  PRINT("Block size 8\n");
   PRINT("+--------------------------------------------------------------+\n" );
 
   /* Release the critical section... */
