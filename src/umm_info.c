@@ -135,7 +135,11 @@ void *umm_info( void *ptr, int force )
       ummHeapInfo.usedBlocks,
       ummHeapInfo.freeBlocks  );
 
-  PRINT("Block size 8\n");
+  PRINT("Total Mem     %5i    Used Mem     %5i    Free Mem     %5i\n",
+      ummHeapInfo.totalBlocks * 8,
+      ummHeapInfo.usedBlocks * 8,
+      ummHeapInfo.freeBlocks * 8 );
+
   PRINT("+--------------------------------------------------------------+\n" );
 
   /* Release the critical section... */
