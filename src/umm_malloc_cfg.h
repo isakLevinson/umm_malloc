@@ -43,17 +43,6 @@
 extern char test_umm_heap[];
 #endif
 
-
-extern uint32_t	_ramEnd;
-extern uint32_t	_ramStart;
-extern uint32_t	_ramLength;
-
-/* Start addresses and the size of the heap */
-//#define UMM_MALLOC_CFG_HEAP_ADDR	(heap)
-//#define UMM_MALLOC_CFG_HEAP_SIZE	UMM_HEAP_SIZE
-#define UMM_MALLOC_CFG_HEAP_ADDR	((UINT32)&_ramEnd)
-#define UMM_MALLOC_CFG_HEAP_SIZE	((UINT32)&_ramLength - ((UINT32)&_ramEnd - (UINT32)&_ramStart))
-
 /* A couple of macros to make packing structures less compiler dependent */
 
 #define UMM_H_ATTPACKPRE

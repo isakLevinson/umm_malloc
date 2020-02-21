@@ -43,6 +43,9 @@
 #include "umm_malloc.h"
 #include "umm_malloc_cfg.h"   /* user-dependent */
 
+
+static UMM_CFG g_ummCfg;
+
 /* ------------------------------------------------------------------------- */
 
 UMM_H_ATTPACKPRE typedef struct umm_ptr_t {
@@ -92,6 +95,23 @@ unsigned short int umm_numblocks = 0;
 #include "umm_integrity.c"
 #include "umm_poison.c"
 #include "umm_info.c"
+
+
+static UINT32	_criticalEnter(void)
+{
+	if (NULL != g_ummCfg.pCbCriticalEnter) {
+		return g_ummCfg.pCbCriticalEnter();
+	}
+	return 0;
+}
+
+static void _criticalExit(UINT32 state)
+{
+	if (NULL != g_ummCfg.pCbCriticalExit) {
+		g_ummCfg.pCbCriticalExit(state);
+	}
+}
+
 
 /* ------------------------------------------------------------------------ */
 
@@ -193,11 +213,14 @@ static unsigned short int umm_assimilate_down( unsigned short int c, unsigned sh
 
 /* ------------------------------------------------------------------------- */
 
-void umm_init( void ) {
+
+void umm_init(UMM_CFG* i_pCfg) {
+	MEMCPY(&g_ummCfg, i_pCfg, sizeof(g_ummCfg));
+
   /* init heap pointer and size, and memset it to 0 */
-  umm_heap = (umm_block *)UMM_MALLOC_CFG_HEAP_ADDR;
-  umm_numblocks = (UMM_MALLOC_CFG_HEAP_SIZE / sizeof(umm_block));
-  memset(umm_heap, 0x00, UMM_MALLOC_CFG_HEAP_SIZE);
+  umm_heap = (umm_block *)i_pCfg->startAddr;//UMM_MALLOC_CFG_HEAP_ADDR;
+  umm_numblocks = i_pCfg->size / sizeof(umm_block);
+  memset(umm_heap, 0x00, i_pCfg->size);
 
   /* setup initial blank heap structure */
   {
@@ -251,7 +274,7 @@ void umm_init( void ) {
 
 /* ------------------------------------------------------------------------
  * Must be called only from within critical sections guarded by
- * UMM_CRITICAL_ENTRY() and UMM_CRITICAL_EXIT().
+ * criticalState = _criticalEnter() and _criticalExit(criticalState).
  */
 
 static void umm_free_core( void *ptr ) {
@@ -303,11 +326,12 @@ static void umm_free_core( void *ptr ) {
 
 /* ------------------------------------------------------------------------ */
 
-void umm_free( void *ptr ) {
-
-  if (umm_heap == NULL) {
-    umm_init();
-  }
+void umm_free( void *ptr )
+{
+	UINT32 criticalState;
+  //if (umm_heap == NULL) {
+  //  umm_init();
+  //}
 
   /* If we're being asked to free a NULL pointer, well that's just silly! */
 
@@ -319,16 +343,15 @@ void umm_free( void *ptr ) {
 
   /* Free the memory withing a protected critical section */
 
-  UMM_CRITICAL_ENTRY();
-
+  criticalState = _criticalEnter();
   umm_free_core( ptr );
 
-  UMM_CRITICAL_EXIT();
+  _criticalExit(criticalState);
 }
 
 /* ------------------------------------------------------------------------
  * Must be called only from within critical sections guarded by
- * UMM_CRITICAL_ENTRY() and UMM_CRITICAL_EXIT().
+ * criticalState = _criticalEnter() and _criticalExit(criticalState).
  */
 
 static void *umm_malloc_core( size_t size ) {
@@ -435,13 +458,14 @@ static void *umm_malloc_core( size_t size ) {
 
 /* ------------------------------------------------------------------------ */
 
-void *umm_malloc( size_t size ) {
-
+void *umm_malloc( size_t size )
+{
   void *ptr = NULL;
+	UINT32 criticalState;
 
-  if (umm_heap == NULL) {
-    umm_init();
-  }
+  //if (umm_heap == NULL) {
+  //  umm_init();
+  //}
 
   /*
    * the very first thing we do is figure out if we're being asked to allocate
@@ -458,11 +482,11 @@ void *umm_malloc( size_t size ) {
 
   /* Allocate the memory withing a protected critical section */
 
-  UMM_CRITICAL_ENTRY();
+  criticalState = _criticalEnter();
 
   ptr = umm_malloc_core( size );
 
-  UMM_CRITICAL_EXIT();
+  _criticalExit(criticalState);
 
   return( ptr );
 }
@@ -479,10 +503,12 @@ void *umm_realloc( void *ptr, size_t size ) {
   unsigned short int c;
 
   size_t curSize;
+	UINT32 criticalState;
 
-  if (umm_heap == NULL) {
-    umm_init();
-  }
+
+  //if (umm_heap == NULL) {
+  //  umm_init();
+  //}
 
   /*
    * This code looks after the case of a NULL value for ptr. The ANSI C
@@ -536,7 +562,7 @@ void *umm_realloc( void *ptr, size_t size ) {
   curSize   = (blockSize*sizeof(umm_block))-(sizeof(((umm_block *)0)->header));
 
   /* Protect the critical section... */
-  UMM_CRITICAL_ENTRY();
+  criticalState = _criticalEnter();
 
   /* Now figure out if the previous and/or next blocks are free as well as
    * their sizes - this will help us to minimize special code later when we
@@ -627,7 +653,7 @@ void *umm_realloc( void *ptr, size_t size ) {
     }
 
     /* Release the critical section... */
-    UMM_CRITICAL_EXIT();
+    _criticalExit(criticalState);
 
     return( ptr );
 }

@@ -27,9 +27,9 @@ int umm_integrity_check(void) {
   unsigned short int prev;
   unsigned short int cur;
 
-  if (umm_heap == NULL) {
-    umm_init();
-  }
+  //if (umm_heap == NULL) {
+  //  umm_init();
+  //}
 
   /* Iterate through all free blocks */
   prev = 0;

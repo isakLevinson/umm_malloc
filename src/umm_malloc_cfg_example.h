@@ -39,11 +39,6 @@
  * ----------------------------------------------------------------------------
  */
 
-
-/* Start addresses and the size of the heap */
-#define UMM_MALLOC_CFG_HEAP_ADDR   /* TODO */
-#define UMM_MALLOC_CFG_HEAP_SIZE   /* TODO */
-
 /* A couple of macros to make packing structures less compiler dependent */
 
 #define UMM_H_ATTPACKPRE
