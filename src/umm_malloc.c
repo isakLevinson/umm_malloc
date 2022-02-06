@@ -216,7 +216,6 @@ static unsigned short int umm_assimilate_down( unsigned short int c, unsigned sh
 
 void umm_init(UMM_CFG* i_pCfg) {
 	MEMCPY(&g_ummCfg, i_pCfg, sizeof(g_ummCfg));
-
   /* init heap pointer and size, and memset it to 0 */
   umm_heap = (umm_block *)i_pCfg->startAddr;//UMM_MALLOC_CFG_HEAP_ADDR;
   umm_numblocks = i_pCfg->size / sizeof(umm_block);

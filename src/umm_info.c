@@ -30,7 +30,8 @@ void *umm_info( void *ptr, int force )
    */
   memset( &ummHeapInfo, 0, sizeof( ummHeapInfo ) );
 
-  PRINT("\n" );
+
+  PRINT("heap start/end: %x - %x\n", umm_heap, umm_heap + umm_numblocks);
   PRINT("+--------+--------+-------+--------+--------+-------+--------+--------+\n" );
   PRINT("|        |%08lx|B %5i|NB %5i|PB %5i|Z %5i|NF %5i|PF %5i|\n",
       (unsigned long)(&UMM_BLOCK(blockNo)),
