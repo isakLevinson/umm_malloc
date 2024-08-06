@@ -97,7 +97,7 @@ unsigned short int umm_numblocks = 0;
 #include "umm_info.c"
 
 
-static UINT32	_criticalEnter(void)
+static uint32_t _criticalEnter(void)
 {
 	if (NULL != g_ummCfg.pCbCriticalEnter) {
 		return g_ummCfg.pCbCriticalEnter();
@@ -105,7 +105,7 @@ static UINT32	_criticalEnter(void)
 	return 0;
 }
 
-static void _criticalExit(UINT32 state)
+static void _criticalExit(uint32_t state)
 {
 	if (NULL != g_ummCfg.pCbCriticalExit) {
 		g_ummCfg.pCbCriticalExit(state);
@@ -215,7 +215,7 @@ static unsigned short int umm_assimilate_down( unsigned short int c, unsigned sh
 
 
 void umm_init(UMM_CFG* i_pCfg) {
-	MEMCPY(&g_ummCfg, i_pCfg, sizeof(g_ummCfg));
+	memcpy(&g_ummCfg, i_pCfg, sizeof(g_ummCfg));
   /* init heap pointer and size, and memset it to 0 */
   umm_heap = (umm_block *)i_pCfg->startAddr;//UMM_MALLOC_CFG_HEAP_ADDR;
   umm_numblocks = i_pCfg->size / sizeof(umm_block);
@@ -327,7 +327,7 @@ static void umm_free_core( void *ptr ) {
 
 void umm_free( void *ptr )
 {
-	UINT32 criticalState;
+	uint32_t criticalState;
   //if (umm_heap == NULL) {
   //  umm_init();
   //}
@@ -460,7 +460,7 @@ static void *umm_malloc_core( size_t size ) {
 void *umm_malloc( size_t size )
 {
   void *ptr = NULL;
-	UINT32 criticalState;
+  uint32_t criticalState;
 
   //if (umm_heap == NULL) {
   //  umm_init();
@@ -502,7 +502,7 @@ void *umm_realloc( void *ptr, size_t size ) {
   unsigned short int c;
 
   size_t curSize;
-	UINT32 criticalState;
+  uint32_t criticalState;
 
 
   //if (umm_heap == NULL) {

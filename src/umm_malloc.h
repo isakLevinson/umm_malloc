@@ -12,7 +12,7 @@
 
 typedef struct {
 	void*	startAddr;
-	UINT32	size;
+	uint32_t	size;
 	T_PF_CRITICAL_ENTER	pCbCriticalEnter;
 	T_PF_CRITICAL_EXIT	pCbCriticalExit;
 } UMM_CFG;
